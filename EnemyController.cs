@@ -1,14 +1,21 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class EnemyController : MonoBehaviour {
     // Start is called before the first frame update
     [Header("Enemy Health")]
     public int health;
 
-    private void attack() {
+    private Vector3 _playerPosition;
+    private NavMeshAgent agent;
 
+    private void Awake() {
+        agent = GetComponent<NavMeshAgent>();
+    }
+
+    private void attack() {
     }
 
     public void takeDamage(int damage) {
@@ -20,5 +27,13 @@ public class EnemyController : MonoBehaviour {
             HUDController.Instance.UpdateHealth("Enemy", health);
             Debug.Log(health);
         }
+    }
+
+    public void Follow(Transform player) {
+        agent.SetDestination(_playerPosition);
+    }
+
+    public void setPlayerPosition(Transform player) {
+        _playerPosition = player.position;
     }
 }
