@@ -6,7 +6,6 @@ public class ProjectileController : MonoBehaviour {
 
     public float timeToLive;
 
-
     [Header("Damage Controller")]
     public int damage;
 
@@ -14,6 +13,10 @@ public class ProjectileController : MonoBehaviour {
         damage = PlayerController.damageToGive;
         Debug.Log("Damage is:  "+damage);
         StartCoroutine(destroyAfter(timeToLive));
+    }
+
+    void Update(){
+
     }
 
     IEnumerator destroyAfter(float time) {
@@ -24,8 +27,9 @@ public class ProjectileController : MonoBehaviour {
     void OnCollisionEnter(Collision other) {
         if (other.collider.tag == "Enemy") {
             other.collider.GetComponent<EnemyController>().takeDamage(damage);
-
-            Destroy(gameObject);
+        }
+         if(other.collider.tag == "Enemy" || other.collider.tag == "Environment" ){
+        	Destroy(gameObject);
         }
     }
 }

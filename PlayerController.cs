@@ -16,10 +16,15 @@ public class PlayerController : MonoBehaviour {
     private float nextFire;
     public Transform projectileSpawn;
     public static int damageToGive;
+    public AudioSource projectileAudio;
 
     private GameObject [] spellArr;
     static int spellIndex = 0;
     public GameObject indicator;
+
+    bool isAttacking = false;
+
+    public Camera viewCamera;
 
     [Header("Player Health")]
     public int health;
@@ -33,30 +38,46 @@ public class PlayerController : MonoBehaviour {
     void Start(){
         spellArr = new GameObject[3];
         hudCntrl = HUDController.Instance;
+
+        projectileAudio = GetComponent<AudioSource> ();
     }
 
     // Update is called once per frame
     void Update() {
-        // //PLAYER MOVEMENT
-        // float horizontalMovement = Input.GetAxis("Horizontal") * translationSpeed;
-        // float verticalMovement = Input.GetAxis("Vertical") * translationSpeed;
 
+        Ray ray = viewCamera.ScreenPointToRay (Input.mousePosition);
+        Plane groundPlane = new Plane (Vector3.up, Vector3.zero); //creates a clickable plane
+        float rayDistance;
 
-        // // if(Input.GetAxis("Vertical")<0){
-        // //     transform.Rotate(0, -180, 0);
-        // // }
-
-        // transform.Translate(horizontalMovement * Time.deltaTime, 0 , verticalMovement * Time.deltaTime);
+        if (groundPlane.Raycast(ray, out rayDistance)) { // sets the distance along the ray where it intersects the plane
+            Vector3 point = ray.GetPoint(rayDistance); //returns a point at rayDistance units along the ray 
+            Debug.DrawLine(ray.origin,point,Color.red); // just a visualization of the ray 
+            if(isAttacking)
+                LookAt(point); // rotate player to point 
+        }
+        if(Input.GetMouseButtonUp(0)) 
+            isAttacking = false; // so player isn't continually rotating whenever the mouse moves  
 
         PlayerInput();
     }
     
+
+
+    public void LookAt(Vector3 lookPoint) {
+        Vector3 heightCorrectedPoint = new Vector3 (lookPoint.x, transform.position.y, lookPoint.z);
+        transform.LookAt (heightCorrectedPoint);
+    }
+
+
     private void FixedUpdate() {
-        //Fixed update should be used whenether dealing with physics. 
-        //As it runs every frame at the exact same time.
+       //Fixed update should be used whenether dealing with physics. 
+       //As it runs every frame at the exact same time.
+
         MovePlayer();
+
     }
     public void Fire() {
+        isAttacking = true;
         GameObject firedProjectile = Instantiate(projectile);
 
         //Ignore collisions between the player and its projectile
@@ -72,10 +93,10 @@ public class PlayerController : MonoBehaviour {
         //firedProjectile.GetComponent<Rigidbody>().velocity =  .forward * projectileSpeed * Time.deltaTime;
         firedProjectile.GetComponent<Rigidbody>().AddForce(projectileSpawn.forward * projectileSpeed, ForceMode.VelocityChange);
         damageToGive = 1;
+
     }
 
     public void Fire(GameObject spell){
-        
         GameObject firedSpell = Instantiate(projectile);
 
         //Ignore collisions between the player and its projectile
@@ -90,6 +111,7 @@ public class PlayerController : MonoBehaviour {
         Debug.Log("Spell I'm using: " + spell.GetComponent<Spell>().getName());
         damageToGive = spell.GetComponent<Spell>().getDamage();
         // projectileSpeed = spell.GetComponent<Spell>().getName();
+        projectileAudio.Play();
         
     }
 
@@ -119,7 +141,7 @@ public class PlayerController : MonoBehaviour {
                 Cursor.visible = !Cursor.visible;
             } else {
                 Debug.Log("ACTIVATING SPELL: ");
-                //Fire(spellArr[0]);
+                Fire(spellArr[0]);
                 indicator.SetActive(!indicator.activeSelf);
                 Cursor.visible = !Cursor.visible;
             }
@@ -145,5 +167,6 @@ public class PlayerController : MonoBehaviour {
 
         Vector3 direction = new Vector3 (horizontalMovement, 0.0f, verticalMovement);
         GetComponent<Rigidbody>().velocity = direction * translationSpeed;
+
     }
 }
