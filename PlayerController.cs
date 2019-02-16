@@ -148,7 +148,6 @@ public class PlayerController : MonoBehaviour {
         }
 
         if (Input.GetButton("Fire3")) {
-
         }
 
         if (Input.GetButton("Fire4")) {
@@ -166,7 +165,7 @@ public class PlayerController : MonoBehaviour {
         float verticalMovement = Input.GetAxis("Vertical");
 
         Vector3 direction = new Vector3 (horizontalMovement, 0.0f, verticalMovement);
+        transform.rotation = Quaternion.LookRotation(direction);
         GetComponent<Rigidbody>().velocity = direction * translationSpeed;
-
     }
 }
