@@ -8,5 +8,6 @@ public class FireBlast : Spell{
 		spellDamage = 2;
 		spellCoolDown = 5;
 		spellDesc = "The target is attacked with an intense blast of all-consuming fire.";
+
 	}
 }

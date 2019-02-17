@@ -16,11 +16,12 @@ public class PlayerController : MonoBehaviour {
     private float nextFire;
     public Transform projectileSpawn;
     public static int damageToGive;
-    public AudioSource projectileAudio;
+    public AudioClip spellAudio;
 
     private GameObject [] spellArr;
     static int spellIndex = 0;
     public GameObject indicator;
+    private GameObject spellProjectile;
 
     bool isAttacking = false;
 
@@ -31,6 +32,8 @@ public class PlayerController : MonoBehaviour {
 
     //Canvas object that controls the main HUD of the game
     private HUDController hudCntrl;
+    
+    // string sfire = "Fireball_projectile";
 
     // private Rigidbody rb;
 
@@ -38,8 +41,6 @@ public class PlayerController : MonoBehaviour {
     void Start(){
         spellArr = new GameObject[3];
         hudCntrl = HUDController.Instance;
-
-        projectileAudio = GetComponent<AudioSource> ();
     }
 
     // Update is called once per frame
@@ -52,11 +53,11 @@ public class PlayerController : MonoBehaviour {
         if (groundPlane.Raycast(ray, out rayDistance)) { // sets the distance along the ray where it intersects the plane
             Vector3 point = ray.GetPoint(rayDistance); //returns a point at rayDistance units along the ray 
             Debug.DrawLine(ray.origin,point,Color.red); // just a visualization of the ray 
-            if(isAttacking)
+            // if(isAttacking)
                 LookAt(point); // rotate player to point 
         }
-        if(Input.GetMouseButtonUp(0)) 
-            isAttacking = false; // so player isn't continually rotating whenever the mouse moves  
+        // if(Input.GetMouseButtonUp(0)) 
+        //     isAttacking = false; // so player isn't continually rotating whenever the mouse moves  
 
         PlayerInput();
     }
@@ -97,7 +98,8 @@ public class PlayerController : MonoBehaviour {
     }
 
     public void Fire(GameObject spell){
-        GameObject firedSpell = Instantiate(projectile);
+        spellProjectile = spell.GetComponent<Spell>().getGameObject();
+        GameObject firedSpell = Instantiate(spellProjectile);
 
         //Ignore collisions between the player and its projectile
         //Physics.IgnoreCollision(spell.GetComponent<Collider>(), 
@@ -110,9 +112,15 @@ public class PlayerController : MonoBehaviour {
         firedSpell.GetComponent<Rigidbody>().AddForce(projectileSpawn.forward * projectileSpeed, ForceMode.VelocityChange);
         Debug.Log("Spell I'm using: " + spell.GetComponent<Spell>().getName());
         damageToGive = spell.GetComponent<Spell>().getDamage();
-        // projectileSpeed = spell.GetComponent<Spell>().getName();
-        projectileAudio.Play();
+
+        playSpellAudio(spell);
+
         
+    }
+
+    public void playSpellAudio(GameObject spell){
+        spellAudio = spell.GetComponent<Spell>().getAudioFire();
+        AudioSource.PlayClipAtPoint(spellAudio, new Vector3(5, 1, 2));
     }
 
     public void Equip(GameObject spell){
@@ -141,6 +149,8 @@ public class PlayerController : MonoBehaviour {
                 Cursor.visible = !Cursor.visible;
             } else {
                 Debug.Log("ACTIVATING SPELL: ");
+                // GameObject proj = GameObject.Instantiate((GameObject)Resources.Load("Fireball_projectile"));
+                
                 Fire(spellArr[0]);
                 indicator.SetActive(!indicator.activeSelf);
                 Cursor.visible = !Cursor.visible;
@@ -165,7 +175,7 @@ public class PlayerController : MonoBehaviour {
         float verticalMovement = Input.GetAxis("Vertical");
 
         Vector3 direction = new Vector3 (horizontalMovement, 0.0f, verticalMovement);
-        transform.rotation = Quaternion.LookRotation(direction);
+        // transform.rotation = Quaternion.LookRotation(direction);
         GetComponent<Rigidbody>().velocity = direction * translationSpeed;
     }
 }

@@ -8,6 +8,9 @@ public class Spell : MonoBehaviour{
     public int spellDamage; 
     public int spellCoolDown;
     public string spellDesc;
+    public AudioClip spellAudioFire;
+    public AudioClip spellAudioCollision;
+    public GameObject spellPrefab;
 
     // public int projectileSpeed;
     
@@ -31,5 +34,19 @@ public class Spell : MonoBehaviour{
     public string getSpellDesc(){
         return spellDesc;
     }
+
+    public AudioClip getAudioFire(){
+        return spellAudioFire;
+    }
+
+    public AudioClip getAudioCollision(){
+        return spellAudioCollision;
+    }
+
+    public GameObject getGameObject(){
+        //return GameObject.Instantiate((GameObject)Resources.Load(sfire))
+        return spellPrefab;
+    }
+
 
 }

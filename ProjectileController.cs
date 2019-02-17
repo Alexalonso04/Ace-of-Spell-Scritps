@@ -6,6 +6,9 @@ public class ProjectileController : MonoBehaviour {
 
     public float timeToLive;
 
+    // public ParticleSystem collisionFX;
+    public AudioClip collisionAudio;
+
     [Header("Damage Controller")]
     public int damage;
 
@@ -29,6 +32,8 @@ public class ProjectileController : MonoBehaviour {
             other.collider.GetComponent<EnemyController>().takeDamage(damage);
         }
          if(other.collider.tag == "Enemy" || other.collider.tag == "Environment" ){
+         	// collisionFX.Play();
+         	AudioSource.PlayClipAtPoint(collisionAudio, new Vector3(5, 1, 2));
         	Destroy(gameObject);
         }
     }
