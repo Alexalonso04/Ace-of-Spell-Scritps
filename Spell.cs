@@ -14,10 +14,10 @@ public class Spell : MonoBehaviour{
     public AudioClip spellAudioCollision;
     public GameObject spellPrefab;
 
-    private bool canShoot = true;
-    private GameObject spellProjectile;
+    public bool canShoot = true;
+    public GameObject spellProjectile;
     public Transform projectileSpawn;
-    GameObject player ;
+    public GameObject player ;
 
     public float coolDown;
 
@@ -58,49 +58,31 @@ public class Spell : MonoBehaviour{
         return spellPrefab;
     }
     
-    public Transform getProjectileSpawn(){
-        //return GameObject.Instantiate((GameObject)Resources.Load(sfire))
-        return projectileSpawn;
-    }
+    // public Transform getProjectileSpawn(){
+    //     //return GameObject.Instantiate((GameObject)Resources.Load(sfire))
+    //     return projectileSpawn;
+    // }
 
-    public void onClick(GameObject spell){
-        if ( coolDown <= 0 ) {
+    public void onClick(){
+        if (canShoot) {
             coolDown = spellCoolDown; 
-            StartCoroutine(Fire(spell));
-
+            StartCoroutine(Fire());
        }
     }
 
-    public IEnumerator Fire(GameObject spell){
-        // Debug.Log(canShoot);
-        // if(canShoot){
+    public IEnumerator Fire(){                    
+       // Cool down for Spell
+        if (spellName == "FireBlast"){
+            GetComponent<FireBlast>().Fire();
+        }
+        
+        canShoot = false;
+        yield return new WaitForSeconds (spellCoolDown);
+        canShoot  = true;
+       
 
-            spellProjectile = spellPrefab;
-            
-            // player= GameObject.Find("Player");
-            // projectileSpawn = player.transform.GetChild(0).GetChild(2);
-            
-            GameObject firedSpell = Instantiate(spellProjectile);
-
-            firedSpell.transform.position = projectileSpawn.position;
-            Vector3 originalRotation = firedSpell.transform.rotation.eulerAngles;
-
-            firedSpell.transform.rotation = Quaternion.Euler(originalRotation.x, transform.eulerAngles.y, originalRotation.z);
-            
-            firedSpell.GetComponent<Rigidbody>().AddForce(projectileSpawn.forward * 36, ForceMode.VelocityChange);
-            Debug.Log("Spell I'm using: " + spellName);
-            playSpellAudio(spell);
-                       
-
-           // Cool down for Spell
-            canShoot = false;
-            yield return new WaitForSeconds (spellCoolDown);
-            canShoot  = true;
-           
-
-        //     coolDown = spellCoolDown;
-        //     canShoot = false;
-        // }
+        coolDown = spellCoolDown;
+      
     }
     
     public void playSpellAudio(GameObject spell){

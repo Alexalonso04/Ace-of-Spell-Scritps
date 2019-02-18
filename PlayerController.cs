@@ -116,7 +116,9 @@ public class PlayerController : MonoBehaviour {
         // playSpellAudio(spell);
 
         damageToGive = spell.GetComponent<Spell>().getDamage();
-        spell.GetComponent<Spell>().onClick(spell);
+        Debug.Log(damageToGive);
+        
+        spell.GetComponent<Spell>().onClick();
 
         
     }
