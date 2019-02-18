@@ -6,8 +6,7 @@ public class FireBlast : Spell{
 	public FireBlast(){
 		spellName = "FireBlast";
 		spellDamage = 2;
-		spellCoolDown = 5;
+		spellCoolDown = 5f;
 		spellDesc = "The target is attacked with an intense blast of all-consuming fire.";
-
 	}
 }

@@ -98,22 +98,25 @@ public class PlayerController : MonoBehaviour {
     }
 
     public void Fire(GameObject spell){
-        spellProjectile = spell.GetComponent<Spell>().getGameObject();
-        GameObject firedSpell = Instantiate(spellProjectile);
+        // spellProjectile = spell.GetComponent<Spell>().getGameObject();
+        // GameObject firedSpell = Instantiate(spellProjectile);
 
-        //Ignore collisions between the player and its projectile
-        //Physics.IgnoreCollision(spell.GetComponent<Collider>(), 
-        //projectileSpawn.parent.GetComponent<Collider>());
+        // //Ignore collisions between the player and its projectile
+        // //Physics.IgnoreCollision(spell.GetComponent<Collider>(), 
+        // //projectileSpawn.parent.GetComponent<Collider>());
 
-        firedSpell.transform.position = projectileSpawn.position;
-        Vector3 originalRotation = projectile.transform.rotation.eulerAngles;
+        // firedSpell.transform.position = projectileSpawn.position;
 
-        firedSpell.transform.rotation = Quaternion.Euler(originalRotation.x, transform.eulerAngles.y, originalRotation.z);
-        firedSpell.GetComponent<Rigidbody>().AddForce(projectileSpawn.forward * projectileSpeed, ForceMode.VelocityChange);
-        Debug.Log("Spell I'm using: " + spell.GetComponent<Spell>().getName());
+        // Vector3 originalRotation = firedSpell.transform.rotation.eulerAngles;
+
+        // firedSpell.transform.rotation = Quaternion.Euler(originalRotation.x, transform.eulerAngles.y, originalRotation.z);
+        // firedSpell.GetComponent<Rigidbody>().AddForce(projectileSpawn.forward * projectileSpeed, ForceMode.VelocityChange);
+        // Debug.Log("Spell I'm using: " + spell.GetComponent<Spell>().getName());
+        // damageToGive = spell.GetComponent<Spell>().getDamage();
+        // playSpellAudio(spell);
+
         damageToGive = spell.GetComponent<Spell>().getDamage();
-
-        playSpellAudio(spell);
+        spell.GetComponent<Spell>().onClick(spell);
 
         
     }
@@ -150,7 +153,6 @@ public class PlayerController : MonoBehaviour {
             } else {
                 Debug.Log("ACTIVATING SPELL: ");
                 // GameObject proj = GameObject.Instantiate((GameObject)Resources.Load("Fireball_projectile"));
-                
                 Fire(spellArr[0]);
                 indicator.SetActive(!indicator.activeSelf);
                 Cursor.visible = !Cursor.visible;
@@ -158,6 +160,7 @@ public class PlayerController : MonoBehaviour {
         }
 
         if (Input.GetButton("Fire3")) {
+            Fire(spellArr[1]);
         }
 
         if (Input.GetButton("Fire4")) {
