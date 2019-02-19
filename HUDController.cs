@@ -48,43 +48,14 @@ public class HUDController : MonoBehaviour {
             spellNames[spellSlot] = name;
     }
 
-    // // Checks if there is an empty spell slot
-    // public int findEmpty(string name){
+    public bool containsSpell(string name){
+        foreach(string s in spellNames){
+            if(s == name)
+                return true;
+        }
+        return false;
 
-    //     // Checks if spell doesn't exist already
-    //     for(int i = 0 ; i < 3; i++){
-    //         if(spellNames[i] == name){
-    //             return 4;
-    //         }
-    //     }
-
-    //     // Checks for an empty slot, and returns first empty slot
-    //     for(int i = 0 ; i < 3; i++){
-    //         if(spellNames[i] == null)
-    //             return i;
-    //     }
-    //     return 4;
-    // }
-
-
-    // //Singleton
-    // private static HUDController _instance;
-    // public static HUDController Instance{
-    //     get{
-    //         // Create logic to create the instance
-    //         if(_instance == null){
-    //             GameObject go = new GameObject("HUDController");
-    //             go.AddComponent<HUDController>();
-    //         }
-    //         return _instance;
-    //     }
-
-    // }
-
-
-    // void Awake(){
-    //     _instance = this;
-    // }    
+    }
 
     public void UpdateHealth(string tag, int ammount) {
         switch (tag) {
