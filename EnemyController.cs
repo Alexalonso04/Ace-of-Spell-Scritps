@@ -1,6 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
+
+[System.Serializable]
+public class PatrolCheckpoint {
+    public Transform checkpoint;
+    public float stayTime;
+}
 
 public class EnemyController : MonoBehaviour {
     
@@ -16,9 +23,38 @@ public class EnemyController : MonoBehaviour {
     [Header("Enemy Health")]
     public int health;
 
-    private void attack() {
 
+    [Header("Behaviour")]
+    public bool patrol;
+    public PatrolCheckpoint[] patrolPoints;
+    private int patrolIndex;
+    public float stoppingDistance;
+    private float nextCheckpointTime;
+
+    private Transform _player;
+    private Vector2 originalPosition;
+    private Quaternion originalRotation;
+    private NavMeshAgent agent;
+
+    private void Awake() {
+        agent = GetComponent<NavMeshAgent>();
+        originalPosition = new Vector2(transform.position.x, transform.position.z);
+        //Vector3.ProjectOnPlane(transform.position, new Vector3(0.0f, 1.0f, 0.0f));
+        originalRotation = transform.rotation;
+        patrolIndex = 0;
     }
+
+    private void attack() {
+    }
+
+    private void Update() {
+        if (patrol && _player == null) {
+            Patrol(patrolPoints);
+        } else {
+            PlayerFollow();
+        }
+    }
+
 
     public void takeDamage(int damage) {
         health -= damage;
@@ -55,7 +91,48 @@ public class EnemyController : MonoBehaviour {
         yield return new WaitForSeconds(0.6f);
         dropItem();
         Destroy(gameObject);
-
-
     }
+    
+
+    public void setPlayerLocation(Transform playerPosition) {
+        _player = playerPosition;
+    }
+
+    private void PlayerFollow() {
+        Vector2 currentPosition = new Vector2(transform.position.x, transform.position.z);
+        patrol = false;
+        agent.stoppingDistance = stoppingDistance; 
+        if (_player != null) {
+            agent.SetDestination(_player.position);
+        } else if (originalPosition != currentPosition) {
+            Debug.Log("Original Position:" + originalPosition);
+            patrol = true;
+            agent.SetDestination(originalPosition);
+        }
+
+        if (currentPosition == originalPosition) {
+            transform.rotation = Quaternion.Lerp(transform.rotation, originalRotation, Time.time * 0.003f);
+        }
+    }
+
+    private void Patrol(PatrolCheckpoint[] patrolLocations) {
+        Vector3 currentPosition;
+        Vector3 targetPosition;
+        agent.stoppingDistance = 0;
+        if (patrol) {
+            currentPosition = new Vector3(transform.position.x, 1.0f, transform.position.z);
+            targetPosition = patrolLocations[patrolIndex].checkpoint.transform.position;
+            Debug.Log("Next position: " + targetPosition);
+            if (currentPosition != targetPosition && Time.time > nextCheckpointTime) {
+                agent.SetDestination(targetPosition);
+            } else if (currentPosition == targetPosition) {
+                nextCheckpointTime = Time.time + patrolLocations[patrolIndex].stayTime;
+                patrolIndex++;
+            }
+
+            if (patrolIndex == patrolLocations.Length) {
+                patrolIndex = 0;
+            }
+        }
+     }
 }

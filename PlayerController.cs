@@ -48,7 +48,7 @@ public class PlayerController : MonoBehaviour {
 
         // transform.Translate(horizontalMovement * Time.deltaTime, 0 , verticalMovement * Time.deltaTime);
 
-        PlayerInput();
+        //PlayerInput();
     }
     
     private void FixedUpdate() {
