@@ -48,7 +48,7 @@ public class PlayerController : MonoBehaviour {
 
         // transform.Translate(horizontalMovement * Time.deltaTime, 0 , verticalMovement * Time.deltaTime);
 
-        //PlayerInput();
+        PlayerInput();
     }
     
     private void FixedUpdate() {
@@ -67,7 +67,7 @@ public class PlayerController : MonoBehaviour {
         firedProjectile.transform.position = projectileSpawn.position;
         Vector3 originalRotation = firedProjectile.transform.rotation.eulerAngles;
 
-        firedProjectile.transform.rotation = Quaternion.Euler(originalRotation.x, transform.eulerAngles.y, originalRotation.z);
+        firedProjectile.transform.rotation = Quaternion.Euler(originalRotation.x, projectileSpawn.rotation.eulerAngles.y, originalRotation.z);
 
         //firedProjectile.GetComponent<Rigidbody>().velocity =  .forward * projectileSpeed * Time.deltaTime;
         firedProjectile.GetComponent<Rigidbody>().AddForce(projectileSpawn.forward * projectileSpeed, ForceMode.VelocityChange);
@@ -85,7 +85,7 @@ public class PlayerController : MonoBehaviour {
         firedSpell.transform.position = projectileSpawn.position;
         Vector3 originalRotation = projectile.transform.rotation.eulerAngles;
 
-        firedSpell.transform.rotation = Quaternion.Euler(originalRotation.x, transform.eulerAngles.y, originalRotation.z);
+        firedSpell.transform.rotation = Quaternion.Euler(originalRotation.x, projectileSpawn.rotation.eulerAngles.y, originalRotation.z);
         firedSpell.GetComponent<Rigidbody>().AddForce(projectileSpawn.forward * projectileSpeed, ForceMode.VelocityChange);
         Debug.Log("Spell I'm using: " + spell.GetComponent<Spell>().getName());
         damageToGive = spell.GetComponent<Spell>().getDamage();
