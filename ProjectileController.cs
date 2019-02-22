@@ -15,17 +15,17 @@ public class ProjectileController : MonoBehaviour {
     void Start() {
         damage = PlayerController.damageToGive;
         Debug.Log("Damage is:  "+damage);
-        StartCoroutine(destroyAfter(timeToLive));
+        // StartCoroutine(destroyAfter(timeToLive));
     }
 
     void Update(){
 
     }
 
-    IEnumerator destroyAfter(float time) {
-        yield return new WaitForSeconds(time);
-        Destroy(gameObject);
-    }
+    // IEnumerator destroyAfter(float time) {
+    //     yield return new WaitForSeconds(time);
+    //     Destroy(gameObject);
+    // }
 
     void OnCollisionEnter(Collision other) {
         if (other.collider.tag == "Enemy") {

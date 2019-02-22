@@ -18,7 +18,9 @@ public class PickupSpells : MonoBehaviour
                 // GameObject.Find("HUD").GetComponent<HUDController>().changeSpell(0, image, name);
                 //TODO: Call Equip(spellPrefab)
                 GameObject.FindWithTag("Player").GetComponent<PlayerController>().Equip(spellPrefab);
-                // spellPrefab.gameObject.SetActive(false);
+                spellPrefab.gameObject.SetActive(false);
+                // spellPrefab.GetComponent<MeshRenderer>().enabled = false;
+                // spellPrefab.GetComponent<BoxCollider>().enabled = false;
                 // Destroy(gameObject);
             }
     }

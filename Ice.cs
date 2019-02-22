@@ -2,12 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-public class FireBlast : Spell{
-	public FireBlast(){
-		spellName = "FireBlast";
-		spellDamage = 2;
-		spellCoolDown = 2f;
-		spellDesc = "The target is attacked with an intense blast of all-consuming fire.";
+public class Ice : Spell{
+	public Ice(){
+		spellName = "Ice";
+		spellDamage = 0;
+		spellCoolDown = 5f;
+		spellDesc = "Enemies around the player face an intense frostbite.";
 	}
 
 	public void Fire(){
@@ -27,6 +27,12 @@ public class FireBlast : Spell{
             firedSpell.GetComponent<Rigidbody>().AddForce(projectileSpawn.forward * 36, ForceMode.VelocityChange);
             Debug.Log("Spell I'm using: " + spellName);
             playSpellAudio();
+                       
+
+           // Cool down for Spell
+            // canShoot = false;
+            // yield return new WaitForSeconds (spellCoolDown);
+            // canShoot  = true;
 
 	}
 

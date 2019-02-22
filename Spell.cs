@@ -63,41 +63,24 @@ public class Spell : MonoBehaviour{
     //     return projectileSpawn;
     // }
 
-    public void onClick(){
-        if (canShoot) {
-            coolDown = spellCoolDown; 
-            StartCoroutine(Fire());
-       }
-    }
+    // public void onClick(){
+    //     if (canShoot) {
+    //         coolDown = spellCoolDown; 
+    //         StartCoroutine(Fire());
+    //    }
+    // }
 
-    public IEnumerator Fire(){                    
-       // Cool down for Spell
+    public void Fire(){                    
+
         if (spellName == "FireBlast"){
             GetComponent<FireBlast>().Fire();
-        }
-        
-        canShoot = false;
-        yield return new WaitForSeconds (spellCoolDown);
-        canShoot  = true;
-       
-
-        coolDown = spellCoolDown;
-      
+        }        
+        if (spellName == "Ice"){
+            GetComponent<Ice>().Fire();
+        }        
     }
     
     public void playSpellAudio(GameObject spell){
         AudioSource.PlayClipAtPoint(spellAudioFire, new Vector3(5, 1, 2));
     }
-
-    void Update(){
-        coolDown -= Time.deltaTime;
-        if(coolDown<=0)
-            canShoot = true;
-        // Debug.Log(coolDown);
-    }
-    void Awake(){
-
-        coolDown = 0;
-    }
-
 }
