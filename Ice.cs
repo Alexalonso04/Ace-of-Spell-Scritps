@@ -27,12 +27,6 @@ public class Ice : Spell{
             firedSpell.GetComponent<Rigidbody>().AddForce(projectileSpawn.forward * 36, ForceMode.VelocityChange);
             Debug.Log("Spell I'm using: " + spellName);
             playSpellAudio();
-                       
-
-           // Cool down for Spell
-            // canShoot = false;
-            // yield return new WaitForSeconds (spellCoolDown);
-            // canShoot  = true;
 
 	}
 

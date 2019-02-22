@@ -23,12 +23,10 @@ public class PlayerController : MonoBehaviour {
     public GameObject indicator;
     private GameObject spellProjectile;
     public GameObject spellUsing;
+    public float coolDownPercentage = 100.0f;
 
     public Camera viewCamera;
-    bool canShoot;
 
-    private float timer = 0.0f;
-    public float coolDownPercentage = 100.0f;
 
     [Header("Player Health")]
     public int health;
@@ -56,11 +54,8 @@ public class PlayerController : MonoBehaviour {
         if (groundPlane.Raycast(ray, out rayDistance)) { // sets the distance along the ray where it intersects the plane
             Vector3 point = ray.GetPoint(rayDistance); //returns a point at rayDistance units along the ray 
             Debug.DrawLine(ray.origin,point,Color.red); // just a visualization of the ray 
-            // if(isAttacking)
-                LookAt(point); // rotate player to point 
+            LookAt(point); // rotate player to point 
         }
-        // if(Input.GetMouseButtonUp(0)) 
-        //     isAttacking = false; // so player isn't continually rotating whenever the mouse moves  
 
         PlayerInput();
          
@@ -103,23 +98,6 @@ public class PlayerController : MonoBehaviour {
     }
 
     public void Fire(GameObject spell){
-        // spellProjectile = spell.GetComponent<Spell>().getGameObject();
-        // GameObject firedSpell = Instantiate(spellProjectile);
-
-        // //Ignore collisions between the player and its projectile
-        // //Physics.IgnoreCollision(spell.GetComponent<Collider>(), 
-        // //projectileSpawn.parent.GetComponent<Collider>());
-
-        // firedSpell.transform.position = projectileSpawn.position;
-
-        // Vector3 originalRotation = firedSpell.transform.rotation.eulerAngles;
-
-        // firedSpell.transform.rotation = Quaternion.Euler(originalRotation.x, transform.eulerAngles.y, originalRotation.z);
-        // firedSpell.GetComponent<Rigidbody>().AddForce(projectileSpawn.forward * projectileSpeed, ForceMode.VelocityChange);
-        // Debug.Log("Spell I'm using: " + spell.GetComponent<Spell>().getName());
-        // damageToGive = spell.GetComponent<Spell>().getDamage();
-        // playSpellAudio(spell);
-
         damageToGive = spell.GetComponent<Spell>().getDamage();
         Debug.Log("Spell firing: "+ spell.GetComponent<Spell>().getName());
         Debug.Log(damageToGive);
