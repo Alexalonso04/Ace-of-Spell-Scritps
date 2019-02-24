@@ -27,12 +27,15 @@ public class PlayerController : MonoBehaviour {
     //Canvas object that controls the main HUD of the game
     private HUDController _hudCntrl;
 
+    private UnityEngine.AI.NavMeshAgent agent;
+
     // private Rigidbody rb;
 
     // Start is called before the first frame update
     void Start(){
         spellArr = new GameObject[3];
         _hudCntrl = HUDController.Instance;
+        agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
     }
 
     // Update is called once per frame
@@ -105,12 +108,10 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void PlayerInput() {
-
         if (Input.GetButton("Fire1") && Time.time > nextFire) {
             nextFire = Time.time + fireRate;    //This controls the fire rate
             Fire();
         }
-
 
         if (Input.GetButtonDown("Fire2")) {
             //GameObject indicator = spellArr[0].GetComponent<Spell>().indicator; to be uncommented when the spell prefab is created
@@ -137,13 +138,27 @@ public class PlayerController : MonoBehaviour {
     public void TakeDamage(int ammount) {
         health -= ammount;
         _hudCntrl.UpdateHealth("Player", health);
+        if (health <= 0) {
+            Destroy(gameObject);
+        } 
     }
 
     public void MovePlayer(){
-        float horizontalMovement = Input.GetAxis("Horizontal");
-        float verticalMovement = Input.GetAxis("Vertical");
+        // float horizontalMovement = Input.GetAxis("Horizontal");
+        // float verticalMovement = Input.GetAxis("Vertical");
 
-        Vector3 direction = new Vector3 (horizontalMovement, 0.0f, verticalMovement);
-        GetComponent<Rigidbody>().velocity = direction * translationSpeed;
+        // Vector3 direction = new Vector3 (horizontalMovement, 0.0f, verticalMovement);
+        // GetComponent<Rigidbody>().velocity = direction * translationSpeed;
+
+        if (Input.GetMouseButton(1)){
+            Ray rayOrigin = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hitInfo;
+
+            if (Physics.Raycast(rayOrigin, out hitInfo)) {
+                if (hitInfo.collider != null) {
+                    agent.SetDestination(hitInfo.point);
+                }
+            }
+        }
     }
 }

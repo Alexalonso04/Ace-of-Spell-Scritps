@@ -52,8 +52,10 @@ public class EnemyController : MonoBehaviour {
             Patrol(patrolPoints);
         } else {
             PlayerFollow();
+            if (Vector3.Distance(transform.position,_playerTransform.position) <= originalStoppingDistance) {
+            attack();
+            }
         }
-        Debug.Log(agent.remainingDistance);
         // if (agent.remainingDistance == 5) {
         //     Debug.Log(agent.remainingDistance + " " + agent.stoppingDistance);
         //     attack();
