@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.AI;
 
 public class PlayerController : MonoBehaviour {
 
@@ -16,9 +17,17 @@ public class PlayerController : MonoBehaviour {
     private float nextFire;
     public Transform projectileSpawn;
     public static int damageToGive;
+    private AudioClip spellAudio;
+  
     private GameObject [] spellArr;
     static int spellIndex = 0;
     public GameObject indicator;
+    private GameObject spellProjectile;
+    private GameObject spellUsing;
+    public float coolDownPercentage = 100.0f;
+
+    public Camera viewCamera;
+
 
     [Header("Player Health")]
     public int health;
@@ -27,7 +36,6 @@ public class PlayerController : MonoBehaviour {
     //Canvas object that controls the main HUD of the game
     private HUDController _hudCntrl;
 
-    private UnityEngine.AI.NavMeshAgent agent;
 
     // private Rigidbody rb;
 
@@ -36,28 +44,48 @@ public class PlayerController : MonoBehaviour {
         spellArr = new GameObject[3];
         _hudCntrl = HUDController.Instance;
         agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+
     }
 
     // Update is called once per frame
     void Update() {
-        // //PLAYER MOVEMENT
-        // float horizontalMovement = Input.GetAxis("Horizontal") * translationSpeed;
-        // float verticalMovement = Input.GetAxis("Vertical") * translationSpeed;
 
+        Ray ray = viewCamera.ScreenPointToRay (Input.mousePosition);
+        Plane groundPlane = new Plane (Vector3.up, Vector3.zero); //creates a clickable plane
+        float rayDistance;
 
-        // // if(Input.GetAxis("Vertical")<0){
-        // //     transform.Rotate(0, -180, 0);
-        // // }
-
-        // transform.Translate(horizontalMovement * Time.deltaTime, 0 , verticalMovement * Time.deltaTime);
+        if (groundPlane.Raycast(ray, out rayDistance)) { // sets the distance along the ray where it intersects the plane
+            Vector3 point = ray.GetPoint(rayDistance); //returns a point at rayDistance units along the ray 
+            Debug.DrawLine(ray.origin,point,Color.red); // just a visualization of the ray 
+            LookAt(point); // rotate player to point 
+        }
 
         PlayerInput();
+        if(spellUsing != null){
+        if(spellUsing.GetComponent<Spell>().canUseASpell()){
+                indicator.SetActive(true);
+                Cursor.visible = !Cursor.visible;
+        }
+        }
+         
+         // coolDownPercentage = (((nextFire-Time.time)/fireRate)*100);
+         // Debug.Log("Cool down percentage: " + coolDownPercentage + "%");
     }
     
+
+
+    public void LookAt(Vector3 lookPoint) {
+        Vector3 heightCorrectedPoint = new Vector3 (lookPoint.x, transform.position.y, lookPoint.z);
+        transform.LookAt (heightCorrectedPoint);
+    }
+
+
     private void FixedUpdate() {
-        //Fixed update should be used whenether dealing with physics. 
-        //As it runs every frame at the exact same time.
+       //Fixed update should be used whenether dealing with physics. 
+       //As it runs every frame at the exact same time.
+
         MovePlayer();
+
     }
     public void Fire() {
         GameObject firedProjectile = Instantiate(projectile);
@@ -75,30 +103,25 @@ public class PlayerController : MonoBehaviour {
         //firedProjectile.GetComponent<Rigidbody>().velocity =  .forward * projectileSpeed * Time.deltaTime;
         firedProjectile.GetComponent<Rigidbody>().AddForce(projectileSpawn.forward * projectileSpeed, ForceMode.VelocityChange);
         damageToGive = 1;
+
     }
 
     public void Fire(GameObject spell){
-        
-        GameObject firedSpell = Instantiate(projectile);
-
-        //Ignore collisions between the player and its projectile
-        //Physics.IgnoreCollision(spell.GetComponent<Collider>(), 
-        //projectileSpawn.parent.GetComponent<Collider>());
-
-        firedSpell.transform.position = projectileSpawn.position;
-        Vector3 originalRotation = projectile.transform.rotation.eulerAngles;
-
-        firedSpell.transform.rotation = Quaternion.Euler(originalRotation.x, projectileSpawn.rotation.eulerAngles.y, originalRotation.z);
-        firedSpell.GetComponent<Rigidbody>().AddForce(projectileSpawn.forward * projectileSpeed, ForceMode.VelocityChange);
-        Debug.Log("Spell I'm using: " + spell.GetComponent<Spell>().getName());
         damageToGive = spell.GetComponent<Spell>().getDamage();
-        // projectileSpeed = spell.GetComponent<Spell>().getName();
+        // Debug.Log("Spell firing: "+ spell.GetComponent<Spell>().getName());
+        // Debug.Log(damageToGive);
         
+        spell.GetComponent<Spell>().Fire();
+    }
+
+    public void playSpellAudio(GameObject spell){
+        spellAudio = spell.GetComponent<Spell>().getAudioFire();
+        AudioSource.PlayClipAtPoint(spellAudio, new Vector3(5, 1, 2));
     }
 
     public void Equip(GameObject spell){
         // if it goes to last index in spell array make it go to 0 index for next spell
-        Debug.Log(spell.GetComponent<Spell>().getName());
+        // Debug.Log(spell.GetComponent<Spell>().getName());
         spellArr[spellIndex] = spell;
         _hudCntrl.changeSpell(spellIndex, spell.GetComponent<Spell>().getImage(),spell.GetComponent<Spell>().getName());
         spellIndex++;
@@ -108,31 +131,54 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void PlayerInput() {
-        if (Input.GetButton("Fire1") && Time.time > nextFire) {
+
+        // if (Input.GetButton("Fire1") && coolDownPercentage<= 0) {
+        if (Input.GetButton("Fire1")) {
             nextFire = Time.time + fireRate;    //This controls the fire rate
-            Fire();
+            // indicator.SetActive(true);
+            // if(spellUsing.GetComponent<Spell>().canUseASpell()){
+            //     indicator.SetActive(true);
+            //     Cursor.visible = !Cursor.visible;
+            // }
+            if(spellUsing != null)
+                Fire(spellUsing);
+            else 
+                Fire();
+            indicator.SetActive(false);
+                Cursor.visible = !Cursor.visible;
         }
+
 
         if (Input.GetButtonDown("Fire2")) {
             //GameObject indicator = spellArr[0].GetComponent<Spell>().indicator; to be uncommented when the spell prefab is created
-            if (!indicator.activeSelf) {
+            if (indicator.activeSelf) {
                 indicator.SetActive(!indicator.activeSelf);
                 Cursor.visible = !Cursor.visible;
             } else {
-                Debug.Log("ACTIVATING SPELL: ");
+                // Debug.Log("ACTIVATING SPELL: ");
+                // GameObject proj = GameObject.Instantiate((GameObject)Resources.Load("Fireball_projectile"));
+                spellUsing = spellArr[0];
                 //Fire(spellArr[0]);
+                // spellUsing.GetComponent<Spell>().coolDownPercentage
+                fireRate = spellArr[0].GetComponent<Spell>().getSpellCoolDown();
+                spellUsing.GetComponent<Spell>().setCoolDownPercentage(0f);
+                // Debug.Log("FIRERATE" + fireRate);
                 indicator.SetActive(!indicator.activeSelf);
                 Cursor.visible = !Cursor.visible;
             }
         }
 
         if (Input.GetButton("Fire3")) {
-
+            spellUsing = spellArr[1];
+            fireRate = spellArr[1].GetComponent<Spell>().getSpellCoolDown();
+            // Fire(spellArr[1]);
         }
 
-        // if (Input.GetButton("Fire4")) {
-        //     Fire(spellArr[2]);
-        // }
+        if (Input.GetButton("Fire4")) {
+             spellUsing = spellArr[2];
+            fireRate = spellUsing.GetComponent<Spell>().getSpellCoolDown();
+        }
+
     }
 
     public void TakeDamage(int ammount) {
