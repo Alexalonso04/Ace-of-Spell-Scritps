@@ -10,28 +10,23 @@ public class PatrolCheckpoint {
 }
 
 public class EnemyController : MonoBehaviour {
-    
-
-    public GameObject deathParticle;
- 
-    [Header("Enemy Drop")]
-    [SerializeField]
-    public GameObject item;
-    public float dropRate;
-    public GameObject itemParticle; 
     // Start is called before the first frame update
-    [Header("Enemy Health")]
+    [Header("Enemy Stats")]
     public int health;
+    public int attackPower;
+    public float attackSpeed;
+    private float _nextAttack;
 
 
     [Header("Behaviour")]
     public bool patrol;
     public PatrolCheckpoint[] patrolPoints;
     private int patrolIndex;
-    public float stoppingDistance;
+    private float originalStoppingDistance;
     private float nextCheckpointTime;
 
-    private Transform _player;
+    private Transform _playerTransform;
+    private PlayerController _playerController;
     private Vector2 originalPosition;
     private Quaternion originalRotation;
     private NavMeshAgent agent;
@@ -42,70 +37,54 @@ public class EnemyController : MonoBehaviour {
         //Vector3.ProjectOnPlane(transform.position, new Vector3(0.0f, 1.0f, 0.0f));
         originalRotation = transform.rotation;
         patrolIndex = 0;
+        originalStoppingDistance = agent.stoppingDistance;
     }
 
     private void attack() {
+        if (Time.time > _nextAttack) {
+            _nextAttack = Time.time + attackSpeed;
+            _playerController.TakeDamage(attackPower);
+        }
     }
 
     private void Update() {
-        if (patrol && _player == null) {
+        if (patrol && _playerTransform == null) {
             Patrol(patrolPoints);
         } else {
             PlayerFollow();
         }
+        Debug.Log(agent.remainingDistance);
+        // if (agent.remainingDistance == 5) {
+        //     Debug.Log(agent.remainingDistance + " " + agent.stoppingDistance);
+        //     attack();
+        // }
     }
-
 
     public void takeDamage(int damage) {
         health -= damage;
+        HUDController.Instance.UpdateHealth("Enemy", health);
         if (health <= 0) {
-            HUDController.Instance.UpdateHealth("Enemy", health);
-            StartCoroutine(enemyDeath());
+            Destroy(gameObject);
+        } 
+    }
+
+    public void setPlayer(GameObject player) {
+        if (player != null){
+            _playerTransform = player.transform;
+            _playerController = player.GetComponent<PlayerController>();
         } else {
-            HUDController.Instance.UpdateHealth("Enemy", health);
-            Debug.Log(health);
+            _playerTransform = null;
+            _playerController = null;
         }
-    }
-
-    // Dropped item has a chance to appear, based on Drop Rate.
-    // If dropped spell is already in the scene, item will not drop until item is removed.
-    public void dropItem(){
-        int randNum = Random.Range(0,100);
-            
-        if(!GameObject.Find(item.name)){
-            Debug.Log("Item found");
-            if(randNum <= dropRate){
-                Instantiate(itemParticle, transform.position, Quaternion.identity);
-                GameObject droppedItem = Instantiate(item, transform.position, Quaternion.identity);
-                droppedItem.name = item.name;
-            }
-        }else{
-            Debug.Log("Item exists lol");
-        }
-        
-    }
-
-    private IEnumerator enemyDeath(){
-        yield return new WaitForSeconds(0.1f);
-        Instantiate(deathParticle, transform.position, Quaternion.identity);
-        yield return new WaitForSeconds(0.6f);
-        dropItem();
-        Destroy(gameObject);
-    }
-    
-
-    public void setPlayerLocation(Transform playerPosition) {
-        _player = playerPosition;
     }
 
     private void PlayerFollow() {
         Vector2 currentPosition = new Vector2(transform.position.x, transform.position.z);
         patrol = false;
-        agent.stoppingDistance = stoppingDistance; 
-        if (_player != null) {
-            agent.SetDestination(_player.position);
+        if (_playerTransform != null) {
+            agent.stoppingDistance = originalStoppingDistance; 
+            agent.SetDestination(_playerTransform.position);
         } else if (originalPosition != currentPosition) {
-            Debug.Log("Original Position:" + originalPosition);
             patrol = true;
             agent.SetDestination(originalPosition);
         }
@@ -122,7 +101,6 @@ public class EnemyController : MonoBehaviour {
         if (patrol) {
             currentPosition = new Vector3(transform.position.x, 1.0f, transform.position.z);
             targetPosition = patrolLocations[patrolIndex].checkpoint.transform.position;
-            Debug.Log("Next position: " + targetPosition);
             if (currentPosition != targetPosition && Time.time > nextCheckpointTime) {
                 agent.SetDestination(targetPosition);
             } else if (currentPosition == targetPosition) {
@@ -134,5 +112,5 @@ public class EnemyController : MonoBehaviour {
                 patrolIndex = 0;
             }
         }
-     }
+    }
 }

@@ -18,7 +18,7 @@ public class FollowTrigger : MonoBehaviour
             if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit)) {
                 Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * hit.distance, Color.yellow);
                 if (hit.collider.tag != "Wall") {
-                    enemy.setPlayerLocation(other.transform);
+                    enemy.setPlayer(other.gameObject);
                 }
             }
         }
@@ -26,7 +26,7 @@ public class FollowTrigger : MonoBehaviour
 
     private void OnTriggerExit(Collider other) {
         if (other.tag == "Player") {
-            enemy.setPlayerLocation(null);
+            enemy.setPlayer(null);
         }
     }
 }
