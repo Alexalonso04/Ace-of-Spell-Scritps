@@ -16,23 +16,23 @@ public class PlayerController : MonoBehaviour {
     private float nextFire;
     public Transform projectileSpawn;
     public static int damageToGive;
-
     private GameObject [] spellArr;
     static int spellIndex = 0;
     public GameObject indicator;
 
     [Header("Player Health")]
     public int health;
+    private GameController _gameController;
 
     //Canvas object that controls the main HUD of the game
-    private HUDController hudCntrl;
+    private HUDController _hudCntrl;
 
     // private Rigidbody rb;
 
     // Start is called before the first frame update
     void Start(){
         spellArr = new GameObject[3];
-        hudCntrl = HUDController.Instance;
+        _hudCntrl = HUDController.Instance;
     }
 
     // Update is called once per frame
@@ -97,7 +97,7 @@ public class PlayerController : MonoBehaviour {
         // if it goes to last index in spell array make it go to 0 index for next spell
         Debug.Log(spell.GetComponent<Spell>().getName());
         spellArr[spellIndex] = spell;
-        hudCntrl.changeSpell(spellIndex, spell.GetComponent<Spell>().getImage(),spell.GetComponent<Spell>().getName());
+        _hudCntrl.changeSpell(spellIndex, spell.GetComponent<Spell>().getImage(),spell.GetComponent<Spell>().getName());
         spellIndex++;
         if (spellIndex == 3){
             spellIndex = 0;
@@ -129,14 +129,14 @@ public class PlayerController : MonoBehaviour {
 
         }
 
-        if (Input.GetButton("Fire4")) {
-            Fire(spellArr[2]);
-        }
+        // if (Input.GetButton("Fire4")) {
+        //     Fire(spellArr[2]);
+        // }
     }
 
     public void TakeDamage(int ammount) {
         health -= ammount;
-        hudCntrl.UpdateHealth("Player", health);
+        _hudCntrl.UpdateHealth("Player", health);
     }
 
     public void MovePlayer(){

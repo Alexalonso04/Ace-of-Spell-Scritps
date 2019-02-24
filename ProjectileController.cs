@@ -10,6 +10,9 @@ public class ProjectileController : MonoBehaviour {
     [Header("Damage Controller")]
     public int damage;
 
+    [Header("Particle Effect")]
+    public GameObject onHitEffect;
+
     void Start() {
         damage = PlayerController.damageToGive;
         Debug.Log("Damage is:  "+damage);
@@ -21,11 +24,14 @@ public class ProjectileController : MonoBehaviour {
         Destroy(gameObject);
     }
 
-    void OnCollisionEnter(Collision other) {
+    private void OnCollisionEnter(Collision other) {
         if (other.collider.tag == "Enemy") {
-            other.collider.GetComponent<EnemyController>().takeDamage(damage);
+            //other.collider.GetComponent<EnemyController>().takeDamage(damage);
+            Instantiate(onHitEffect, this.transform.position, Quaternion.identity);
 
             Destroy(gameObject);
         }
+        Debug.Log("Collided with " + other.collider.tag);
+
     }
 }
