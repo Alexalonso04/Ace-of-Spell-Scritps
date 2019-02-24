@@ -58,6 +58,10 @@ public class PlayerController : MonoBehaviour {
         }
 
         PlayerInput();
+        if(spellUsing.GetComponent<Spell>().canUseASpell()){
+                indicator.SetActive(true);
+                Cursor.visible = !Cursor.visible;
+        }
          
          // coolDownPercentage = (((nextFire-Time.time)/fireRate)*100);
          // Debug.Log("Cool down percentage: " + coolDownPercentage + "%");
@@ -128,7 +132,14 @@ public class PlayerController : MonoBehaviour {
         // if (Input.GetButton("Fire1") && coolDownPercentage<= 0) {
         if (Input.GetButton("Fire1")) {
             nextFire = Time.time + fireRate;    //This controls the fire rate
+            // indicator.SetActive(true);
+            // if(spellUsing.GetComponent<Spell>().canUseASpell()){
+            //     indicator.SetActive(true);
+            //     Cursor.visible = !Cursor.visible;
+            // }
             Fire(spellUsing);
+            indicator.SetActive(false);
+                Cursor.visible = !Cursor.visible;
         }
 
 

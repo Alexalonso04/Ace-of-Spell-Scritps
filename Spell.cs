@@ -20,7 +20,7 @@ public class Spell : MonoBehaviour{
 
     public static float coolDownPercentage = 100f;
     public static float nextFireTime;
-    public bool canUseSpell;
+    public static bool canUseSpell = true;
 
     public string getName(){
         return spellName;
@@ -60,18 +60,28 @@ public class Spell : MonoBehaviour{
     	return coolDownPercentage;
     }
 
+    public bool canUseASpell(){
+    	Debug.Log(canUseSpell);
+    	return canUseSpell;
+    }
+
     void Update(){
-    	Debug.Log("%" + coolDownPercentage);
+    	// Debug.Log("%" + coolDownPercentage);
     	if(coolDownPercentage != 0)
        		coolDownPercentage = (((nextFireTime-Time.time)/spellCoolDown)*100);
+       	
+       	if(coolDownPercentage<=0){    
+    		canUseSpell = true;       
+    	}
 
-        Debug.Log("%" + coolDownPercentage);
+        // Debug.Log("%" + coolDownPercentage);
 
     }
 
     public void Fire(){   
 
-    if(coolDownPercentage<=0){           
+    if(coolDownPercentage<=0){    
+    	canUseSpell = true;       
         nextFireTime = Time.time + spellCoolDown;
         coolDownPercentage = (((nextFireTime-Time.time)/spellCoolDown)*100);
        
@@ -81,6 +91,9 @@ public class Spell : MonoBehaviour{
             if (spellName == "Ice"){
                 GetComponent<Ice>().Fire();
             }        
+        }
+        else{
+        	canUseSpell = false;
         }
     }
     
