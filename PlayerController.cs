@@ -22,7 +22,7 @@ public class PlayerController : MonoBehaviour {
     static int spellIndex = 0;
     public GameObject indicator;
     private GameObject spellProjectile;
-    public GameObject spellUsing;
+    private GameObject spellUsing;
     public float coolDownPercentage = 100.0f;
 
     public Camera viewCamera;
@@ -58,9 +58,11 @@ public class PlayerController : MonoBehaviour {
         }
 
         PlayerInput();
+        if(spellUsing != null){
         if(spellUsing.GetComponent<Spell>().canUseASpell()){
                 indicator.SetActive(true);
                 Cursor.visible = !Cursor.visible;
+        }
         }
          
          // coolDownPercentage = (((nextFire-Time.time)/fireRate)*100);
@@ -135,7 +137,10 @@ public class PlayerController : MonoBehaviour {
             //     indicator.SetActive(true);
             //     Cursor.visible = !Cursor.visible;
             // }
-            Fire(spellUsing);
+            if(spellUsing != null)
+                Fire(spellUsing);
+            else 
+                Fire();
             indicator.SetActive(false);
                 Cursor.visible = !Cursor.visible;
         }

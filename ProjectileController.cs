@@ -8,7 +8,6 @@ public class ProjectileController : MonoBehaviour {
 
     // public ParticleSystem collisionFX;
     public AudioClip collisionAudio;
-    public GameObject onHitEffect;
 
     [Header("Damage Controller")]
     public int damage;
