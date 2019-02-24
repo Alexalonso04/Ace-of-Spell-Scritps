@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.AI;
 
 public class PlayerController : MonoBehaviour {
 
@@ -42,6 +43,8 @@ public class PlayerController : MonoBehaviour {
     void Start(){
         spellArr = new GameObject[3];
         _hudCntrl = HUDController.Instance;
+        agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+
     }
 
     // Update is called once per frame
@@ -181,14 +184,27 @@ public class PlayerController : MonoBehaviour {
     public void TakeDamage(int ammount) {
         health -= ammount;
         _hudCntrl.UpdateHealth("Player", health);
+        if (health <= 0) {
+            Destroy(gameObject);
+        } 
     }
 
     public void MovePlayer(){
-        float horizontalMovement = Input.GetAxis("Horizontal");
-        float verticalMovement = Input.GetAxis("Vertical");
+        // float horizontalMovement = Input.GetAxis("Horizontal");
+        // float verticalMovement = Input.GetAxis("Vertical");
 
-        Vector3 direction = new Vector3 (horizontalMovement, 0.0f, verticalMovement);
-        // transform.rotation = Quaternion.LookRotation(direction);
-        GetComponent<Rigidbody>().velocity = direction * translationSpeed;
+        // Vector3 direction = new Vector3 (horizontalMovement, 0.0f, verticalMovement);
+        // GetComponent<Rigidbody>().velocity = direction * translationSpeed;
+
+        if (Input.GetMouseButton(1)){
+            Ray rayOrigin = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hitInfo;
+
+            if (Physics.Raycast(rayOrigin, out hitInfo)) {
+                if (hitInfo.collider != null) {
+                    agent.SetDestination(hitInfo.point);
+                }
+            }
+        }
     }
 }
