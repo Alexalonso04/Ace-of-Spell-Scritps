@@ -13,6 +13,9 @@ public class ProjectileController : MonoBehaviour {
     [Header("Damage Controller")]
     public int damage;
 
+    [Header("Particle Effect")]
+    public GameObject onHitEffect;
+
     void Start() {
         damage = PlayerController.damageToGive;
         Debug.Log("Damage is:  "+damage);
@@ -22,7 +25,7 @@ public class ProjectileController : MonoBehaviour {
 
     }
 
-    void OnCollisionEnter(Collision other) {
+    private void OnCollisionEnter(Collision other) {
         if (other.collider.tag == "Enemy") {
             other.collider.GetComponent<EnemyController>().takeDamage(damage);
         }
@@ -35,5 +38,7 @@ public class ProjectileController : MonoBehaviour {
             // Destroy(onHitEffect);
         	Destroy(gameObject);
         }
+        Debug.Log("Collided with " + other.collider.tag);
+
     }
 }

@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour {
     public Transform projectileSpawn;
     public static int damageToGive;
     private AudioClip spellAudio;
-
+  
     private GameObject [] spellArr;
     static int spellIndex = 0;
     public GameObject indicator;
@@ -30,18 +30,18 @@ public class PlayerController : MonoBehaviour {
 
     [Header("Player Health")]
     public int health;
+    private GameController _gameController;
 
     //Canvas object that controls the main HUD of the game
-    private HUDController hudCntrl;
-    
-    // string sfire = "Fireball_projectile";
+    private HUDController _hudCntrl;
+
 
     // private Rigidbody rb;
 
     // Start is called before the first frame update
     void Start(){
         spellArr = new GameObject[3];
-        hudCntrl = HUDController.Instance;
+        _hudCntrl = HUDController.Instance;
     }
 
     // Update is called once per frame
@@ -93,7 +93,7 @@ public class PlayerController : MonoBehaviour {
         firedProjectile.transform.position = projectileSpawn.position;
         Vector3 originalRotation = firedProjectile.transform.rotation.eulerAngles;
 
-        firedProjectile.transform.rotation = Quaternion.Euler(originalRotation.x, transform.eulerAngles.y, originalRotation.z);
+        firedProjectile.transform.rotation = Quaternion.Euler(originalRotation.x, projectileSpawn.rotation.eulerAngles.y, originalRotation.z);
 
         //firedProjectile.GetComponent<Rigidbody>().velocity =  .forward * projectileSpeed * Time.deltaTime;
         firedProjectile.GetComponent<Rigidbody>().AddForce(projectileSpawn.forward * projectileSpeed, ForceMode.VelocityChange);
@@ -107,8 +107,6 @@ public class PlayerController : MonoBehaviour {
         // Debug.Log(damageToGive);
         
         spell.GetComponent<Spell>().Fire();
-
-        
     }
 
     public void playSpellAudio(GameObject spell){
@@ -120,7 +118,7 @@ public class PlayerController : MonoBehaviour {
         // if it goes to last index in spell array make it go to 0 index for next spell
         // Debug.Log(spell.GetComponent<Spell>().getName());
         spellArr[spellIndex] = spell;
-        hudCntrl.changeSpell(spellIndex, spell.GetComponent<Spell>().getImage(),spell.GetComponent<Spell>().getName());
+        _hudCntrl.changeSpell(spellIndex, spell.GetComponent<Spell>().getImage(),spell.GetComponent<Spell>().getName());
         spellIndex++;
         if (spellIndex == 3){
             spellIndex = 0;
@@ -172,11 +170,12 @@ public class PlayerController : MonoBehaviour {
              spellUsing = spellArr[2];
             fireRate = spellUsing.GetComponent<Spell>().getSpellCoolDown();
         }
+
     }
 
     public void TakeDamage(int ammount) {
         health -= ammount;
-        hudCntrl.UpdateHealth("Player", health);
+        _hudCntrl.UpdateHealth("Player", health);
     }
 
     public void MovePlayer(){

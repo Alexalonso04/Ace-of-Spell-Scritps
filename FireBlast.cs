@@ -43,3 +43,4 @@ public class FireBlast : Spell{
         AudioSource.PlayClipAtPoint(spellAudioFire, new Vector3(5, 1, 2));
     }
 }
+
