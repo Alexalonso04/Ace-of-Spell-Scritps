@@ -16,7 +16,7 @@ public class PlayerController : MonoBehaviour {
     private float nextFire;
     public Transform projectileSpawn;
     public static int damageToGive;
-    public AudioClip spellAudio;
+    private AudioClip spellAudio;
 
     private GameObject [] spellArr;
     static int spellIndex = 0;
@@ -59,8 +59,8 @@ public class PlayerController : MonoBehaviour {
 
         PlayerInput();
          
-         coolDownPercentage = (((nextFire-Time.time)/fireRate)*100);
-         Debug.Log("Cool down percentage: " + coolDownPercentage + "%");
+         // coolDownPercentage = (((nextFire-Time.time)/fireRate)*100);
+         // Debug.Log("Cool down percentage: " + coolDownPercentage + "%");
     }
     
 
@@ -99,8 +99,8 @@ public class PlayerController : MonoBehaviour {
 
     public void Fire(GameObject spell){
         damageToGive = spell.GetComponent<Spell>().getDamage();
-        Debug.Log("Spell firing: "+ spell.GetComponent<Spell>().getName());
-        Debug.Log(damageToGive);
+        // Debug.Log("Spell firing: "+ spell.GetComponent<Spell>().getName());
+        // Debug.Log(damageToGive);
         
         spell.GetComponent<Spell>().Fire();
 
@@ -114,7 +114,7 @@ public class PlayerController : MonoBehaviour {
 
     public void Equip(GameObject spell){
         // if it goes to last index in spell array make it go to 0 index for next spell
-        Debug.Log(spell.GetComponent<Spell>().getName());
+        // Debug.Log(spell.GetComponent<Spell>().getName());
         spellArr[spellIndex] = spell;
         hudCntrl.changeSpell(spellIndex, spell.GetComponent<Spell>().getImage(),spell.GetComponent<Spell>().getName());
         spellIndex++;
@@ -125,7 +125,8 @@ public class PlayerController : MonoBehaviour {
 
     private void PlayerInput() {
 
-        if (Input.GetButton("Fire1") && coolDownPercentage<= 0) {
+        // if (Input.GetButton("Fire1") && coolDownPercentage<= 0) {
+        if (Input.GetButton("Fire1")) {
             nextFire = Time.time + fireRate;    //This controls the fire rate
             Fire(spellUsing);
         }
@@ -137,12 +138,14 @@ public class PlayerController : MonoBehaviour {
                 indicator.SetActive(!indicator.activeSelf);
                 Cursor.visible = !Cursor.visible;
             } else {
-                Debug.Log("ACTIVATING SPELL: ");
+                // Debug.Log("ACTIVATING SPELL: ");
                 // GameObject proj = GameObject.Instantiate((GameObject)Resources.Load("Fireball_projectile"));
                 spellUsing = spellArr[0];
                 //Fire(spellArr[0]);
+                // spellUsing.GetComponent<Spell>().coolDownPercentage
                 fireRate = spellArr[0].GetComponent<Spell>().getSpellCoolDown();
-                Debug.Log("FIRERATE" + fireRate);
+                spellUsing.GetComponent<Spell>().setCoolDownPercentage(0f);
+                // Debug.Log("FIRERATE" + fireRate);
                 indicator.SetActive(!indicator.activeSelf);
                 Cursor.visible = !Cursor.visible;
             }

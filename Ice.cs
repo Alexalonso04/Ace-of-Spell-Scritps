@@ -6,7 +6,7 @@ public class Ice : Spell{
 	public Ice(){
 		spellName = "Ice";
 		spellDamage = 0;
-		spellCoolDown = 5f;
+		spellCoolDown = 10f;
 		spellDesc = "Enemies around the player face an intense frostbite.";
 	}
 
