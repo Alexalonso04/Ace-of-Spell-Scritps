@@ -44,7 +44,7 @@ public class PlayerController : MonoBehaviour {
         spellArr = new GameObject[3];
         _hudCntrl = HUDController.Instance;
         agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
-
+        _gameController = GameController.Instance;
     }
 
     // Update is called once per frame
@@ -61,12 +61,6 @@ public class PlayerController : MonoBehaviour {
         }
 
         PlayerInput();
-        if(spellUsing != null){
-        if(spellUsing.GetComponent<Spell>().canUseASpell()){
-                indicator.SetActive(true);
-                Cursor.visible = !Cursor.visible;
-        }
-        }
          
          // coolDownPercentage = (((nextFire-Time.time)/fireRate)*100);
          // Debug.Log("Cool down percentage: " + coolDownPercentage + "%");
@@ -133,17 +127,20 @@ public class PlayerController : MonoBehaviour {
     private void PlayerInput() {
 
         // if (Input.GetButton("Fire1") && coolDownPercentage<= 0) {
-        if (Input.GetButton("Fire1")) {
+        if (Input.GetButtonDown("Fire1")) {
             nextFire = Time.time + fireRate;    //This controls the fire rate
             // indicator.SetActive(true);
             // if(spellUsing.GetComponent<Spell>().canUseASpell()){
             //     indicator.SetActive(true);
             //     Cursor.visible = !Cursor.visible;
             // }
-            if(spellUsing != null)
+            if(spellUsing != null){
                 Fire(spellUsing);
-            else 
+                spellUsing = null;
+            }
+            else{
                 Fire();
+            }
             indicator.SetActive(false);
                 Cursor.visible = !Cursor.visible;
         }
@@ -151,21 +148,21 @@ public class PlayerController : MonoBehaviour {
 
         if (Input.GetButtonDown("Fire2")) {
             //GameObject indicator = spellArr[0].GetComponent<Spell>().indicator; to be uncommented when the spell prefab is created
-            if (indicator.activeSelf) {
-                indicator.SetActive(!indicator.activeSelf);
-                Cursor.visible = !Cursor.visible;
-            } else {
-                    // Debug.Log("ACTIVATING SPELL: ");
-                    // GameObject proj = GameObject.Instantiate((GameObject)Resources.Load("Fireball_projectile"));
+            // if (indicator.activeSelf) {
+            //     indicator.SetActive(!indicator.activeSelf);
+            //     Cursor.visible = !Cursor.visible;
+            // } else {
                     spellUsing = spellArr[0];
-                    //Fire(spellArr[0]);
-                    // spellUsing.GetComponent<Spell>().coolDownPercentage
                     fireRate = spellArr[0].GetComponent<Spell>().getSpellCoolDown();
-                    spellUsing.GetComponent<Spell>().setCoolDownPercentage(0f);
-                    // Debug.Log("FIRERATE" + fireRate);
-                    indicator.SetActive(!indicator.activeSelf);
-                    Cursor.visible = !Cursor.visible;
-            }
+                    // indicator.SetActive(!indicator.activeSelf);
+                    // Cursor.visible = !Cursor.visible;
+                    if( spellUsing.GetComponent<Spell>().canUseASpell() == true){
+                        indicator.SetActive(true);
+                    }
+                    else{
+                        indicator.SetActive(false);
+                    }
+            // }
         }
 
         if (Input.GetButton("Fire3")) {
@@ -185,6 +182,8 @@ public class PlayerController : MonoBehaviour {
         health -= ammount;
         _hudCntrl.UpdateHealth("Player", health);
         if (health <= 0) {
+            // _gameController.respawnTrigger = true;
+
             Destroy(gameObject);
         } 
     }

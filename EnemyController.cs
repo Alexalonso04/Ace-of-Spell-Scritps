@@ -26,13 +26,14 @@ public class EnemyController : MonoBehaviour {
     public GameObject itemParticle; 
 
     [Header("Behaviour")]
+    public Transform playerTransform;
     public bool patrol;
     public PatrolCheckpoint[] patrolPoints;
     private int patrolIndex;
     private float originalStoppingDistance;
     private float nextCheckpointTime;
 
-    private Transform _playerTransform;
+    
     private PlayerController _playerController;
     private Vector2 originalPosition;
     private Quaternion originalRotation;
@@ -45,23 +46,33 @@ public class EnemyController : MonoBehaviour {
         originalRotation = transform.rotation;
         patrolIndex = 0;
         originalStoppingDistance = agent.stoppingDistance;
+        _playerController = GameObject.FindWithTag("Player").GetComponent<PlayerController>();
+
     }
 
     private void attack() {
         if (Time.time > _nextAttack) {
             _nextAttack = Time.time + attackSpeed;
-            _playerController.TakeDamage(attackPower);
+            if (_playerController != null) {
+                Debug.Log("Can attack");
+                _playerController.TakeDamage(attackPower);
+            }
         }
     }
 
     private void Update() {
-        if (patrol && _playerTransform == null) {
+        if (patrol) {
             Patrol(patrolPoints);
         } else {
             PlayerFollow();
             // if (Vector3.Distance(transform.position,_playerTransform.position) <= originalStoppingDistance) {
             //     attack();
             // }
+            if (playerTransform != null) {
+                if (Vector3.Distance(transform.position, playerTransform.position) <= originalStoppingDistance) {
+                    attack();
+                }
+            }
         }
         // if (agent.remainingDistance == 5) {
         //     Debug.Log(agent.remainingDistance + " " + agent.stoppingDistance);
@@ -106,21 +117,14 @@ public class EnemyController : MonoBehaviour {
     }
 
     public void setPlayer(GameObject player) {
-        if (player != null){
-            _playerTransform = player.transform;
-            _playerController = player.GetComponent<PlayerController>();
-        } else {
-            _playerTransform = null;
-            _playerController = null;
-        }
+        playerTransform = player.transform;
     }
 
     private void PlayerFollow() {
         Vector2 currentPosition = new Vector2(transform.position.x, transform.position.z);
-        patrol = false;
-        if (_playerTransform != null) {
+        if (playerTransform != null) {
             agent.stoppingDistance = originalStoppingDistance; 
-            agent.SetDestination(_playerTransform.position);
+            agent.SetDestination(playerTransform.position);
         } else if (originalPosition != currentPosition) {
             patrol = true;
             agent.SetDestination(originalPosition);

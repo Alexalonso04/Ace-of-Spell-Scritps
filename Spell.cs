@@ -55,13 +55,13 @@ public class Spell : MonoBehaviour{
     }
     
     public float setCoolDownPercentage(float percent){
-    	Debug.Log("***********************I SET IT TO ZERO***************************" + percent);
+    	// Debug.Log("***********************I SET IT TO ZERO***************************" + percent);
     	coolDownPercentage = percent;
     	return coolDownPercentage;
     }
 
     public bool canUseASpell(){
-    	// Debug.Log(canUseSpell);
+    	Debug.Log(canUseSpell);
     	return canUseSpell;
     }
 
@@ -73,8 +73,11 @@ public class Spell : MonoBehaviour{
        	if(coolDownPercentage<=0){    
     		canUseSpell = true;       
     	}
+        else{
+            canUseSpell = false;
+        }
 
-        // Debug.Log("%" + coolDownPercentage);
+        Debug.Log("Cool down percentage: " + coolDownPercentage);
 
     }
 
