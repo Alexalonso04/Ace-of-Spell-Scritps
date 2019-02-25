@@ -29,13 +29,13 @@ public class ProjectileController : MonoBehaviour {
             other.collider.GetComponent<EnemyController>().takeDamage(damage);
         }
          if(other.collider.tag == "Enemy" || other.collider.tag == "Environment" ){
-         	// collisionFX.Play();
-         	AudioSource.PlayClipAtPoint(collisionAudio, new Vector3(5, 1, 2));
+            // collisionFX.Play();
+            AudioSource.PlayClipAtPoint(collisionAudio, new Vector3(5, 1, 2));
             // Instantiate(onHitEffect, this.transform.position, Quaternion.identity);
             GameObject clone = (GameObject)Instantiate(onHitEffect, this.transform.position, Quaternion.identity);
             Destroy(clone, 1.0f);
             // Destroy(onHitEffect);
-        	Destroy(gameObject);
+            Destroy(gameObject);
         }
         Debug.Log("Collided with " + other.collider.tag);
 

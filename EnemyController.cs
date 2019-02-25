@@ -11,12 +11,19 @@ public class PatrolCheckpoint {
 
 public class EnemyController : MonoBehaviour {
     // Start is called before the first frame update
+
+     public GameObject deathParticle;
     [Header("Enemy Stats")]
     public int health;
     public int attackPower;
     public float attackSpeed;
     private float _nextAttack;
-
+    
+    [Header("Enemy Drop")]
+    [SerializeField]
+    public GameObject item;
+    public float dropRate;
+    public GameObject itemParticle; 
 
     [Header("Behaviour")]
     public bool patrol;
@@ -52,9 +59,9 @@ public class EnemyController : MonoBehaviour {
             Patrol(patrolPoints);
         } else {
             PlayerFollow();
-            if (Vector3.Distance(transform.position,_playerTransform.position) <= originalStoppingDistance) {
-            attack();
-            }
+            // if (Vector3.Distance(transform.position,_playerTransform.position) <= originalStoppingDistance) {
+            //     attack();
+            // }
         }
         // if (agent.remainingDistance == 5) {
         //     Debug.Log(agent.remainingDistance + " " + agent.stoppingDistance);
@@ -64,10 +71,38 @@ public class EnemyController : MonoBehaviour {
 
     public void takeDamage(int damage) {
         health -= damage;
-        HUDController.Instance.UpdateHealth("Enemy", health);
         if (health <= 0) {
-            Destroy(gameObject);
-        } 
+            StartCoroutine(enemyDeath());
+            // Destroy(gameObject);
+        }else{
+         HUDController.Instance.UpdateHealth("Enemy", health);
+        }
+    }
+
+     // Dropped item has a chance to appear, based on Drop Rate.
+    // If dropped spell is already in the scene, item will not drop until item is removed.
+    public void dropItem(){
+        int randNum = Random.Range(0,100);
+
+        if(!GameObject.Find(item.name)){
+            Debug.Log("Item found");
+            if(randNum <= dropRate){
+                Instantiate(itemParticle, transform.position, Quaternion.identity);
+                GameObject droppedItem = Instantiate(item, transform.position, Quaternion.identity);
+                droppedItem.name = item.name;
+            }
+        }else{
+            Debug.Log("Item exists lol");
+        }
+
+    }
+
+    private IEnumerator enemyDeath(){
+        yield return new WaitForSeconds(0.1f);
+        Instantiate(deathParticle, transform.position, Quaternion.identity);
+        yield return new WaitForSeconds(0.6f);
+        dropItem();
+        Destroy(gameObject);
     }
 
     public void setPlayer(GameObject player) {

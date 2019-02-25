@@ -61,7 +61,7 @@ public class Spell : MonoBehaviour{
     }
 
     public bool canUseASpell(){
-    	Debug.Log(canUseSpell);
+    	// Debug.Log(canUseSpell);
     	return canUseSpell;
     }
 

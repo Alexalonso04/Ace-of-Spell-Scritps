@@ -35,7 +35,7 @@ public class PlayerController : MonoBehaviour {
 
     //Canvas object that controls the main HUD of the game
     private HUDController _hudCntrl;
-
+    private NavMeshAgent agent;
 
     // private Rigidbody rb;
 
@@ -155,16 +155,16 @@ public class PlayerController : MonoBehaviour {
                 indicator.SetActive(!indicator.activeSelf);
                 Cursor.visible = !Cursor.visible;
             } else {
-                // Debug.Log("ACTIVATING SPELL: ");
-                // GameObject proj = GameObject.Instantiate((GameObject)Resources.Load("Fireball_projectile"));
-                spellUsing = spellArr[0];
-                //Fire(spellArr[0]);
-                // spellUsing.GetComponent<Spell>().coolDownPercentage
-                fireRate = spellArr[0].GetComponent<Spell>().getSpellCoolDown();
-                spellUsing.GetComponent<Spell>().setCoolDownPercentage(0f);
-                // Debug.Log("FIRERATE" + fireRate);
-                indicator.SetActive(!indicator.activeSelf);
-                Cursor.visible = !Cursor.visible;
+                    // Debug.Log("ACTIVATING SPELL: ");
+                    // GameObject proj = GameObject.Instantiate((GameObject)Resources.Load("Fireball_projectile"));
+                    spellUsing = spellArr[0];
+                    //Fire(spellArr[0]);
+                    // spellUsing.GetComponent<Spell>().coolDownPercentage
+                    fireRate = spellArr[0].GetComponent<Spell>().getSpellCoolDown();
+                    spellUsing.GetComponent<Spell>().setCoolDownPercentage(0f);
+                    // Debug.Log("FIRERATE" + fireRate);
+                    indicator.SetActive(!indicator.activeSelf);
+                    Cursor.visible = !Cursor.visible;
             }
         }
 
