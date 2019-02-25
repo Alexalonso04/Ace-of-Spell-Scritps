@@ -1,27 +1,17 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 public class Spell : MonoBehaviour{
-    // private const float SPELL_COOL_DOWN = 3.0f;
-
     public string spellName;
     public Texture spellImage;
     public int spellDamage; 
-    public float spellCoolDown;
+    public int spellCoolDown;
     public string spellDesc;
-    public AudioClip spellAudioFire;
-    public AudioClip spellAudioCollision;
-    public GameObject spellPrefab;
 
-    public GameObject spellProjectile;
-    public Transform projectileSpawn;
-    public GameObject player ;
-
-    public static float coolDownPercentage = 100f;
-    public static float nextFireTime;
-    public static bool canUseSpell = true;
-
+    // public int projectileSpeed;
+    
+ 
     public string getName(){
         return spellName;
     }
@@ -34,7 +24,7 @@ public class Spell : MonoBehaviour{
         return spellDamage;
     }
 
-    public float getSpellCoolDown(){
+    public int getSpellCoolDown(){
         return spellCoolDown;
     }
 
@@ -42,62 +32,4 @@ public class Spell : MonoBehaviour{
         return spellDesc;
     }
 
-    public AudioClip getAudioFire(){
-        return spellAudioFire;
-    }
-
-    public AudioClip getAudioCollision(){
-        return spellAudioCollision;
-    }
-
-    public GameObject getGameObject(){
-        return spellPrefab;
-    }
-    
-    public float setCoolDownPercentage(float percent){
-    	Debug.Log("***********************I SET IT TO ZERO***************************" + percent);
-    	coolDownPercentage = percent;
-    	return coolDownPercentage;
-    }
-
-    public bool canUseASpell(){
-    	// Debug.Log(canUseSpell);
-    	return canUseSpell;
-    }
-
-    void Update(){
-    	// Debug.Log("%" + coolDownPercentage);
-    	if(coolDownPercentage != 0)
-       		coolDownPercentage = (((nextFireTime-Time.time)/spellCoolDown)*100);
-       	
-       	if(coolDownPercentage<=0){    
-    		canUseSpell = true;       
-    	}
-
-        // Debug.Log("%" + coolDownPercentage);
-
-    }
-
-    public void Fire(){   
-
-    if(coolDownPercentage<=0){    
-    	canUseSpell = true;       
-        nextFireTime = Time.time + spellCoolDown;
-        coolDownPercentage = (((nextFireTime-Time.time)/spellCoolDown)*100);
-       
-            if (spellName == "FireBlast"){
-                GetComponent<FireBlast>().Fire();
-            }        
-            if (spellName == "Ice"){
-                GetComponent<Ice>().Fire();
-            }        
-        }
-        else{
-        	canUseSpell = false;
-        }
-    }
-    
-    public void playSpellAudio(GameObject spell){
-        AudioSource.PlayClipAtPoint(spellAudioFire, new Vector3(5, 1, 2));
-    }
 }

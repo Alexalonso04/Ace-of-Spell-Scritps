@@ -15,8 +15,6 @@ public class PickupSpells : MonoBehaviour
                 //TODO: Call Equip(spellPrefab)
                 GameObject.FindWithTag("Player").GetComponent<PlayerController>().Equip(spellPrefab);
                 spellPrefab.gameObject.SetActive(false);
-                // spellPrefab.GetComponent<MeshRenderer>().enabled = false;
-                // spellPrefab.GetComponent<BoxCollider>().enabled = false;
                 // Destroy(gameObject);
             }
     }

@@ -5,7 +5,7 @@ using UnityEngine;
 public class Checkpoint : MonoBehaviour {
     // Start is called before the first frame update
     private GameController _gameController;
-    void Awake() {
+    void Start() {
         _gameController = GameController.Instance;
     }
 

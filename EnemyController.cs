@@ -11,19 +11,12 @@ public class PatrolCheckpoint {
 
 public class EnemyController : MonoBehaviour {
     // Start is called before the first frame update
-
-     public GameObject deathParticle;
     [Header("Enemy Stats")]
     public int health;
     public int attackPower;
     public float attackSpeed;
     private float _nextAttack;
-    
-    [Header("Enemy Drop")]
-    [SerializeField]
-    public GameObject item;
-    public float dropRate;
-    public GameObject itemParticle; 
+
 
     [Header("Behaviour")]
     public bool patrol;
@@ -32,7 +25,7 @@ public class EnemyController : MonoBehaviour {
     private float originalStoppingDistance;
     private float nextCheckpointTime;
 
-    private Transform _playerTransform;
+    public Transform playerTransform;
     private PlayerController _playerController;
     private Vector2 originalPosition;
     private Quaternion originalRotation;
@@ -45,23 +38,29 @@ public class EnemyController : MonoBehaviour {
         originalRotation = transform.rotation;
         patrolIndex = 0;
         originalStoppingDistance = agent.stoppingDistance;
+        _playerController = GameObject.FindWithTag("Player").GetComponent<PlayerController>();
     }
 
     private void attack() {
         if (Time.time > _nextAttack) {
             _nextAttack = Time.time + attackSpeed;
-            _playerController.TakeDamage(attackPower);
+            if (_playerController != null) {
+                Debug.Log("Can attack");
+                _playerController.TakeDamage(attackPower);
+            }
         }
     }
 
     private void Update() {
-        if (patrol && _playerTransform == null) {
+        if (patrol) {
             Patrol(patrolPoints);
         } else {
             PlayerFollow();
-            // if (Vector3.Distance(transform.position,_playerTransform.position) <= originalStoppingDistance) {
-            //     attack();
-            // }
+            if (playerTransform != null) {
+                if (Vector3.Distance(transform.position, playerTransform.position) <= originalStoppingDistance) {
+                    attack();
+                }
+            }
         }
         // if (agent.remainingDistance == 5) {
         //     Debug.Log(agent.remainingDistance + " " + agent.stoppingDistance);
@@ -71,60 +70,26 @@ public class EnemyController : MonoBehaviour {
 
     public void takeDamage(int damage) {
         health -= damage;
+        HUDController.Instance.UpdateHealth("Enemy", health);
         if (health <= 0) {
-            StartCoroutine(enemyDeath());
-            // Destroy(gameObject);
-        }else{
-         HUDController.Instance.UpdateHealth("Enemy", health);
-        }
-    }
-
-     // Dropped item has a chance to appear, based on Drop Rate.
-    // If dropped spell is already in the scene, item will not drop until item is removed.
-    public void dropItem(){
-        int randNum = Random.Range(0,100);
-
-        if(!GameObject.Find(item.name)){
-            Debug.Log("Item found");
-            if(randNum <= dropRate){
-                Instantiate(itemParticle, transform.position, Quaternion.identity);
-                GameObject droppedItem = Instantiate(item, transform.position, Quaternion.identity);
-                droppedItem.name = item.name;
-            }
-        }else{
-            Debug.Log("Item exists lol");
-        }
-
-    }
-
-    private IEnumerator enemyDeath(){
-        yield return new WaitForSeconds(0.1f);
-        Instantiate(deathParticle, transform.position, Quaternion.identity);
-        yield return new WaitForSeconds(0.6f);
-        dropItem();
-        Destroy(gameObject);
+            Destroy(gameObject);
+        } 
     }
 
     public void setPlayer(GameObject player) {
-        if (player != null){
-            _playerTransform = player.transform;
-            _playerController = player.GetComponent<PlayerController>();
-        } else {
-            _playerTransform = null;
-            _playerController = null;
-        }
+        playerTransform = player.transform;
+        //_playerController = player.GetComponent<PlayerController>();
     }
 
     private void PlayerFollow() {
         Vector2 currentPosition = new Vector2(transform.position.x, transform.position.z);
-        patrol = false;
-        if (_playerTransform != null) {
+        if (playerTransform != null) {
             agent.stoppingDistance = originalStoppingDistance; 
-            agent.SetDestination(_playerTransform.position);
-        } else if (originalPosition != currentPosition) {
-            patrol = true;
-            agent.SetDestination(originalPosition);
-        }
+            agent.SetDestination(playerTransform.position);
+         } else if (originalPosition != currentPosition) {
+             patrol = true;
+             agent.SetDestination(originalPosition);
+         }
 
         if (currentPosition == originalPosition) {
             transform.rotation = Quaternion.Lerp(transform.rotation, originalRotation, Time.time * 0.003f);
@@ -135,7 +100,8 @@ public class EnemyController : MonoBehaviour {
         Vector3 currentPosition;
         Vector3 targetPosition;
         agent.stoppingDistance = 0;
-        if (patrol) {
+        Debug.Log("Patrolling");
+        //if (patrol) {
             currentPosition = new Vector3(transform.position.x, 1.0f, transform.position.z);
             targetPosition = patrolLocations[patrolIndex].checkpoint.transform.position;
             if (currentPosition != targetPosition && Time.time > nextCheckpointTime) {
@@ -148,6 +114,6 @@ public class EnemyController : MonoBehaviour {
             if (patrolIndex == patrolLocations.Length) {
                 patrolIndex = 0;
             }
-        }
+        //}
     }
 }
