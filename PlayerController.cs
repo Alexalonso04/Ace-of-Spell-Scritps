@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.AI;
 
 public class PlayerController : MonoBehaviour {
 
@@ -22,7 +23,7 @@ public class PlayerController : MonoBehaviour {
     static int spellIndex = 0;
     public GameObject indicator;
     private GameObject spellProjectile;
-    public GameObject spellUsing;
+    private GameObject spellUsing;
     public float coolDownPercentage = 100.0f;
 
     public Camera viewCamera;
@@ -34,7 +35,7 @@ public class PlayerController : MonoBehaviour {
 
     //Canvas object that controls the main HUD of the game
     private HUDController _hudCntrl;
-
+    private NavMeshAgent agent;
 
     // private Rigidbody rb;
 
@@ -42,6 +43,8 @@ public class PlayerController : MonoBehaviour {
     void Start(){
         spellArr = new GameObject[3];
         _hudCntrl = HUDController.Instance;
+        agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+
     }
 
     // Update is called once per frame
@@ -58,10 +61,6 @@ public class PlayerController : MonoBehaviour {
         }
 
         PlayerInput();
-        if(spellUsing.GetComponent<Spell>().canUseASpell()){
-                indicator.SetActive(true);
-                Cursor.visible = !Cursor.visible;
-        }
          
          // coolDownPercentage = (((nextFire-Time.time)/fireRate)*100);
          // Debug.Log("Cool down percentage: " + coolDownPercentage + "%");
@@ -128,14 +127,20 @@ public class PlayerController : MonoBehaviour {
     private void PlayerInput() {
 
         // if (Input.GetButton("Fire1") && coolDownPercentage<= 0) {
-        if (Input.GetButton("Fire1")) {
+        if (Input.GetButtonDown("Fire1")) {
             nextFire = Time.time + fireRate;    //This controls the fire rate
             // indicator.SetActive(true);
             // if(spellUsing.GetComponent<Spell>().canUseASpell()){
             //     indicator.SetActive(true);
             //     Cursor.visible = !Cursor.visible;
             // }
-            Fire(spellUsing);
+            if(spellUsing != null){
+                Fire(spellUsing);
+                spellUsing = null;
+            }
+            else{
+                Fire();
+            }
             indicator.SetActive(false);
                 Cursor.visible = !Cursor.visible;
         }
@@ -143,21 +148,21 @@ public class PlayerController : MonoBehaviour {
 
         if (Input.GetButtonDown("Fire2")) {
             //GameObject indicator = spellArr[0].GetComponent<Spell>().indicator; to be uncommented when the spell prefab is created
-            if (indicator.activeSelf) {
-                indicator.SetActive(!indicator.activeSelf);
-                Cursor.visible = !Cursor.visible;
-            } else {
-                // Debug.Log("ACTIVATING SPELL: ");
-                // GameObject proj = GameObject.Instantiate((GameObject)Resources.Load("Fireball_projectile"));
-                spellUsing = spellArr[0];
-                //Fire(spellArr[0]);
-                // spellUsing.GetComponent<Spell>().coolDownPercentage
-                fireRate = spellArr[0].GetComponent<Spell>().getSpellCoolDown();
-                spellUsing.GetComponent<Spell>().setCoolDownPercentage(0f);
-                // Debug.Log("FIRERATE" + fireRate);
-                indicator.SetActive(!indicator.activeSelf);
-                Cursor.visible = !Cursor.visible;
-            }
+            // if (indicator.activeSelf) {
+            //     indicator.SetActive(!indicator.activeSelf);
+            //     Cursor.visible = !Cursor.visible;
+            // } else {
+                    spellUsing = spellArr[0];
+                    fireRate = spellArr[0].GetComponent<Spell>().getSpellCoolDown();
+                    // indicator.SetActive(!indicator.activeSelf);
+                    // Cursor.visible = !Cursor.visible;
+                    if( spellUsing.GetComponent<Spell>().canUseASpell() == true){
+                        indicator.SetActive(true);
+                    }
+                    else{
+                        indicator.SetActive(false);
+                    }
+            // }
         }
 
         if (Input.GetButton("Fire3")) {
@@ -176,14 +181,27 @@ public class PlayerController : MonoBehaviour {
     public void TakeDamage(int ammount) {
         health -= ammount;
         _hudCntrl.UpdateHealth("Player", health);
+        if (health <= 0) {
+            Destroy(gameObject);
+        } 
     }
 
     public void MovePlayer(){
-        float horizontalMovement = Input.GetAxis("Horizontal");
-        float verticalMovement = Input.GetAxis("Vertical");
+        // float horizontalMovement = Input.GetAxis("Horizontal");
+        // float verticalMovement = Input.GetAxis("Vertical");
 
-        Vector3 direction = new Vector3 (horizontalMovement, 0.0f, verticalMovement);
-        // transform.rotation = Quaternion.LookRotation(direction);
-        GetComponent<Rigidbody>().velocity = direction * translationSpeed;
+        // Vector3 direction = new Vector3 (horizontalMovement, 0.0f, verticalMovement);
+        // GetComponent<Rigidbody>().velocity = direction * translationSpeed;
+
+        if (Input.GetMouseButton(1)){
+            Ray rayOrigin = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hitInfo;
+
+            if (Physics.Raycast(rayOrigin, out hitInfo)) {
+                if (hitInfo.collider != null) {
+                    agent.SetDestination(hitInfo.point);
+                }
+            }
+        }
     }
 }

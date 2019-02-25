@@ -55,33 +55,36 @@ public class Spell : MonoBehaviour{
     }
     
     public float setCoolDownPercentage(float percent){
-    	Debug.Log("***********************I SET IT TO ZERO***************************" + percent);
-    	coolDownPercentage = percent;
-    	return coolDownPercentage;
+        // Debug.Log("***********************I SET IT TO ZERO***************************" + percent);
+        coolDownPercentage = percent;
+        return coolDownPercentage;
     }
 
     public bool canUseASpell(){
-    	Debug.Log(canUseSpell);
-    	return canUseSpell;
+        Debug.Log(canUseSpell);
+        return canUseSpell;
     }
 
     void Update(){
-    	// Debug.Log("%" + coolDownPercentage);
-    	if(coolDownPercentage != 0)
-       		coolDownPercentage = (((nextFireTime-Time.time)/spellCoolDown)*100);
-       	
-       	if(coolDownPercentage<=0){    
-    		canUseSpell = true;       
-    	}
-
         // Debug.Log("%" + coolDownPercentage);
+        if(coolDownPercentage != 0)
+            coolDownPercentage = (((nextFireTime-Time.time)/spellCoolDown)*100);
+        
+        if(coolDownPercentage<=0){    
+            canUseSpell = true;       
+        }
+        else{
+            canUseSpell = false;
+        }
+
+        Debug.Log("Cool down percentage: " + coolDownPercentage);
 
     }
 
     public void Fire(){   
 
     if(coolDownPercentage<=0){    
-    	canUseSpell = true;       
+        canUseSpell = true;       
         nextFireTime = Time.time + spellCoolDown;
         coolDownPercentage = (((nextFireTime-Time.time)/spellCoolDown)*100);
        
@@ -93,7 +96,7 @@ public class Spell : MonoBehaviour{
             }        
         }
         else{
-        	canUseSpell = false;
+            canUseSpell = false;
         }
     }
     
