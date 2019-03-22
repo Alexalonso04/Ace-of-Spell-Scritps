@@ -83,21 +83,32 @@ public class Spell : MonoBehaviour{
 
     public void Fire(){   
 
+<<<<<<< HEAD
         if(coolDownPercentage<=0){    
     	    canUseSpell = true;       
             nextFireTime = Time.time + spellCoolDown;
             coolDownPercentage = (((nextFireTime-Time.time)/spellCoolDown)*100);
+=======
+    if(coolDownPercentage<=0){    
+    	canUseSpell = true;       
+        nextFireTime = Time.time + spellCoolDown;
+        coolDownPercentage = (((nextFireTime-Time.time)/spellCoolDown)*100);
+>>>>>>> 0aa451b095362ffd79ecea443c90e9827348fcad
        
             if (spellName == "FireBlast"){
                 GetComponent<FireBlast>().Fire();
             }        
             if (spellName == "Ice"){
                 GetComponent<Ice>().Fire();
+<<<<<<< HEAD
             }
             if (spellName == "Electrocute")
             {
                 GetComponent<Electrocute>().Fire();
             }
+=======
+            }        
+>>>>>>> 0aa451b095362ffd79ecea443c90e9827348fcad
         }
         else{
         	canUseSpell = false;
